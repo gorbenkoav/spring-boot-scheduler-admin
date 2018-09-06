@@ -1,27 +1,30 @@
 <template xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
-    <div class="scheduler-admin">
-        <table class="table is-fullwidth">
+    <div class="container">
+        <table class="table is-hoverable is-fullwidth">
             <thead>
             <tr>
-                <th>Имя</th>
+                <th>Name</th>
                 <th>Id</th>
-                <th>Расписание</th>
-                <th>Активность</th>
+                <th>Timetable</th>
+                <th>Is enable</th>
             </tr>
             </thead>
             <tbody v-for="task in tasks" :key="task.id">
-            <tr v-bind:style="[task.isEnable ? {'color': 'green'} : {'color': 'grey'}]">
+            <tr v-bind:style="[task.enable ? {'color': 'green'} : {'color': 'grey'}]">
                 <td v-text="task.name"/>
                 <td v-text="task.id"/>
                 <td v-text="task.timetable"/>
+                <div class="control">
+
                 <td>
-                    <button v-if="task.isEnable" v-bind:style="{'color': 'grey'}" v-on:click="enableTask(task)">
+                    <button class="button is-light" v-if="task.enable" v-bind:style="{'color': 'grey'}" v-on:click="enableTask(task)">
                         Pause
                     </button>
-                    <button v-else="task.isEnable" v-bind:style="{'color': 'green'}" v-on:click="enableTask(task)">
+                    <button class="button is-light" v-else="task.enable" v-bind:style="{'color': 'green'}" v-on:click="enableTask(task)">
                         Start
                     </button>
                 </td>
+                </div>
             </tr>
             </tbody>
         </table>
@@ -29,20 +32,6 @@
 </template>
 
 <script>
-
-    var tasks = [{
-        name: 'Sample One',
-        id: 'ag.tools.admin.scheduler.client.Schedulers.sampleOne',
-        timetable: '1 sec',
-        isEnable: true
-    },
-        {
-            name: 'Sample Two',
-            id: 'ag.tools.admin.scheduler.client.Schedulers.sampleTwo',
-            timetable: '5 sec',
-            isEnable: false
-        }
-    ]
 
     export default {
         props: {
@@ -54,23 +43,16 @@
         data: () => ({
             hasLoaded: false,
             error: null,
-            tasks: tasks
+            tasks: []
         }),
         methods: {
             enableTask: function (task) {
-                task.isEnable = !task.isEnable
+                task.enable = !task.enable
             }
         },
         async created() {
-            const response = await this.instance.axios.get('actuator/health');
-            //data.tasks = response.data;
+            const response = await this.instance.axios.get('actuator/scheduler-admin');
+            this.tasks = response.data;
         }
     };
 </script>
-
-<style>
-    .scheduler-admin {
-        font-size: 20px;
-        width: 80%;
-    }
-</style>

@@ -9,7 +9,7 @@ SBA.use({
             component: schedulerAdminEndpoint,
             label: 'Scheduler Admin',
             order: 1000,
-            isEnabled: ({instance}) => instance.hasEndpoint('health')
+            isEnabled: ({instance}) => instance.hasEndpoint('scheduler-admin')
         });
     }
 });
