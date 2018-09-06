@@ -11,7 +11,13 @@ public class Schedulers {
     private static final Logger LOGGER = LoggerFactory.getLogger(Schedulers.class);
 
     @Scheduled(fixedDelay = 2 * 1000)
-    void sample(){
-        LOGGER.info("execute");
+    void sampleOne(){
+        LOGGER.info("execute one");
     }
+
+    @Scheduled(fixedDelay = 5 * 1000)
+    void sampleTwo(){
+        LOGGER.info("execute two");
+    }
+
 }

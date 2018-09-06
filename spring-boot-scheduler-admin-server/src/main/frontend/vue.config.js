@@ -2,7 +2,7 @@ module.exports = {
     outputDir: 'target/dist',
     chainWebpack: config => {
         config.entryPoints.delete('app');
-        config.entry('custom').add('./extensions/index.js');
+        config.entry('scheduler-admin').add('./extensions/scheduler-admin.js');
         config.externals({
             vue: {
                 commonjs: 'vue',
