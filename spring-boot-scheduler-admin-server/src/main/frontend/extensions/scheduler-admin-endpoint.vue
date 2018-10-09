@@ -46,7 +46,8 @@
             tasks: []
         }),
         methods: {
-            enableTask: function (task) {
+            enableTask: async function (task) {
+                const response = await this.instance.axios.post('actuator/scheduler-admin/'+task.id, {'isEnable': !task.enable});
                 task.enable = !task.enable
             }
         },

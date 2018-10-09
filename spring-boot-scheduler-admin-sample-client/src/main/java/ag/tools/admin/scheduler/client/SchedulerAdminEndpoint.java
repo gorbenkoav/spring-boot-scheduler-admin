@@ -12,8 +12,6 @@ import org.springframework.boot.actuate.scheduling.ScheduledTasksEndpoint;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,32 +21,15 @@ public class SchedulerAdminEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerAdminEndpoint.class);
 
-//    private final Map<String, Boolean> taskEnabling;
-
     private ScheduledTasksEndpoint scheduledTasksEndpoint;
 
+    private ScheduledTaskEnablingHolder taskEnablingHolder;
+
     @Autowired
-    public SchedulerAdminEndpoint(ScheduledTasksEndpoint delegate) {
+    public SchedulerAdminEndpoint(ScheduledTasksEndpoint delegate, ScheduledTaskEnablingHolder taskEnablingHolder) {
         this.scheduledTasksEndpoint = delegate;
-//        taskEnabling = new ConcurrentHashMap<>();
+        this.taskEnablingHolder = taskEnablingHolder;
     }
-
-//    public Map<String, Boolean> getTaskEnabling() {
-//        Stream<ScheduledTasksEndpoint.TaskDescription> taskDescriptionStream = Stream.of(
-//                scheduledTasksEndpoint.scheduledTasks().getCron(),
-//                scheduledTasksEndpoint.scheduledTasks().getFixedDelay(),
-//                scheduledTasksEndpoint.scheduledTasks().getFixedRate()
-//        ).flatMap(List::stream);
-//
-//        taskEnabling.putAll(taskDescriptionStream.collect(Collectors.toMap(i -> i.getRunnable().getTarget(), i -> true)));
-//        LOGGER.info("taskEnabling {}", taskEnabling);
-//        return taskEnabling;
-//    }
-
-    //@ReadOperation
-//    public WebEndpointResponse<Map<String, Boolean>> scheduledTaskEnabling() {
-//        return new WebEndpointResponse<>(taskEnabling);
-//    }
 
     @ReadOperation
     public WebEndpointResponse<List<ScheduledTask>> scheduledTasks() {
@@ -59,13 +40,17 @@ public class SchedulerAdminEndpoint {
         ).flatMap(List::stream);
 
         List<ScheduledTask> scheduledTasks = taskDescriptionStream.
-                map(t -> new ScheduledTask(t.getRunnable().getTarget(), "Some Name", "Some Time", true)).
+                map(t -> new ScheduledTask(t.getRunnable().getTarget(),
+                        "Some Name",
+                        "Some Time",
+                        taskEnablingHolder.isTaskEnable(t.getRunnable().getTarget()))).
                 collect(Collectors.toList());
+        LOGGER.info("ScheduledTasks {}", scheduledTasks);
         return new WebEndpointResponse<>(scheduledTasks);
     }
 
-   // @WriteOperation
-//    public void configureTask(@Selector String arg0, Boolean isEnable) {
-//        taskEnabling.put(arg0, isEnable);
-//    }
+    @WriteOperation
+    public void configureTask(@Selector String arg0, Boolean isEnable) {
+        taskEnablingHolder.setTaskEnable(arg0, isEnable);
+    }
 }
