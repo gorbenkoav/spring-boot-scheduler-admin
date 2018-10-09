@@ -15,7 +15,6 @@ public class ScheduledTaskEnablingHolder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTaskEnablingHolder.class);
 
     public boolean isTaskEnable(String task) {
-        LOGGER.info("Get enabling for task {}", task);
         return taskEnabling.getOrDefault(task, true);
     }
 
