@@ -23,12 +23,12 @@ public class SchedulerAdminEndpoint {
 
     private ScheduledTasksEndpoint scheduledTasksEndpoint;
 
-    private ScheduledTaskEnablingHolder taskEnablingHolder;
+    private ScheduledTaskConfigurationHolder taskConfigurationHolder;
 
     @Autowired
-    public SchedulerAdminEndpoint(ScheduledTasksEndpoint delegate, ScheduledTaskEnablingHolder taskEnablingHolder) {
+    public SchedulerAdminEndpoint(ScheduledTasksEndpoint delegate, ScheduledTaskConfigurationHolder taskConfigurationHolder) {
         this.scheduledTasksEndpoint = delegate;
-        this.taskEnablingHolder = taskEnablingHolder;
+        this.taskConfigurationHolder = taskConfigurationHolder;
     }
 
     @ReadOperation
@@ -41,9 +41,9 @@ public class SchedulerAdminEndpoint {
 
         List<ScheduledTask> scheduledTasks = taskDescriptionStream.
                 map(t -> new ScheduledTask(t.getRunnable().getTarget(),
-                        "Some Name",
+                        taskConfigurationHolder.getTaskName(t.getRunnable().getTarget()),
                         "Some Time",
-                        taskEnablingHolder.isTaskEnable(t.getRunnable().getTarget()))).
+                        taskConfigurationHolder.isTaskEnable(t.getRunnable().getTarget()))).
                 collect(Collectors.toList());
         LOGGER.info("ScheduledTasks {}", scheduledTasks);
         return new WebEndpointResponse<>(scheduledTasks);
@@ -51,6 +51,6 @@ public class SchedulerAdminEndpoint {
 
     @WriteOperation
     public void configureTask(@Selector String arg0, Boolean isEnable) {
-        taskEnablingHolder.setTaskEnable(arg0, isEnable);
+        taskConfigurationHolder.setTaskEnable(arg0, isEnable);
     }
 }

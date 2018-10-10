@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class ScheduledTaskEnablingAspect {
+public class ScheduledTaskAspect {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTaskEnablingAspect.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTaskAspect.class);
 
-    private ScheduledTaskEnablingHolder taskEnablingHolder;
+    private ScheduledTaskConfigurationHolder taskConfigurationHolder;
 
     @Autowired
-    public ScheduledTaskEnablingAspect(ScheduledTaskEnablingHolder taskEnablingHolder) {
-        this.taskEnablingHolder = taskEnablingHolder;
+    public ScheduledTaskAspect(ScheduledTaskConfigurationHolder taskConfigurationHolder) {
+        this.taskConfigurationHolder = taskConfigurationHolder;
     }
 
     @Around("@annotation(org.springframework.scheduling.annotation.Scheduled)")
@@ -29,9 +29,9 @@ public class ScheduledTaskEnablingAspect {
         if (signature instanceof MethodSignature) {
             MethodSignature methodSignature = (MethodSignature) signature;
             String taskId = methodSignature.getDeclaringTypeName() + "." + methodSignature.getName();
-            LOGGER.info("Enabling of task {} is {}.", taskId, taskEnablingHolder.isTaskEnable(taskId));
+            LOGGER.info("Enabling of task {} is {}.", taskId, taskConfigurationHolder.isTaskEnable(taskId));
 
-            if (taskEnablingHolder.isTaskEnable(taskId)) {
+            if (taskConfigurationHolder.isTaskEnable(taskId)) {
                 joinPoint.proceed();
             }
         }
